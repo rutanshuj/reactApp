@@ -4,6 +4,8 @@ import './components/Projects';
 import Projects from "./components/Projects";
 import AddProject from "./components/AddProject";
 import uuid from 'uuid';
+import $ from 'jquery';
+import Todos from './components/Todos';
 
 class App extends Component {
   constructor(){
@@ -11,32 +13,57 @@ class App extends Component {
       this.state ={
           projects: [
 
+          ],
+          todos: [
+
           ]
       }
   }
+    getTodos(){
+      $.ajax({
+          url: "https://jsonplaceholder.typicode.com/todos",
+          datatype: 'json',
+          cache: false,
+          success: function (data) {
+              this.setState({todos: data}, function(){
+                  console.log(this.state);
+              });
+          }.bind(this),
+          error: function (shr, status, err) {
+              console.log(err);
+          }
+      });
+    }
 
+    getProjects(){
+        this.setState({
+            projects:[
+                {
+                    id: uuid.v4(),
+                    title: "Business Website",
+                    category: 'Web Design'
+                },
+                {
+                    id:uuid.v4(),
+                    title: "Social App",
+                    category: 'Mobile Development'
+                },
+
+                {
+                    id:uuid.v4(),
+                    title: "Ecommerce Shopping Cart",
+                    category: 'Web Development'
+                }
+            ]
+        });
+    }
   //lifecycle method
   componentWillMount(){
-      this.setState({
-          projects:[
-              {
-                  id: uuid.v4(),
-                  title: "Business Website",
-                  category: 'Web Design'
-              },
-              {
-                  id:uuid.v4(),
-                  title: "Social App",
-                  category: 'Mobile Development'
-              },
-
-              {
-                  id:uuid.v4(),
-                  title: "Ecommerce Shopping Cart",
-                  category: 'Web Development'
-              }
-          ]
-      });
+      this.getProjects();
+      this.getTodos();
+  }
+  componentDidMount(){
+      this.getTodos();
   }
   handleAddProject(project){
       let projects = this.state.projects;
@@ -54,6 +81,8 @@ class App extends Component {
       <div className="App">
           <AddProject addProject={this.handleAddProject.bind(this)}/>
           <Projects onDelete ={this.handleDeleteProject.bind(this)} projects = {this.state.projects}/>
+          <hr/>
+          <Todos todos={this.state.todos}/>
       </div>
     );
   }
